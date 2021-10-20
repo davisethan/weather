@@ -12,6 +12,7 @@ class SightseeingSights extends React.Component {
     this.handleNewLatitudeChange = this.handleNewLatitudeChange.bind(this);
     this.handleNewLongitudeChange = this.handleNewLongitudeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   componentDidMount() {
@@ -33,19 +34,19 @@ class SightseeingSights extends React.Component {
     });
   }
 
-  handleNewLatitudeChange(event){
+  handleNewLatitudeChange(event) {
     this.setState({
       newLatitude: event.target.value
     });
   }
 
-  handleNewLongitudeChange(event){
+  handleNewLongitudeChange(event) {
     this.setState({
       newLongitude: event.target.value
     });
   }
 
-  handleSubmit(event){
+  handleSubmit(event) {
     event.preventDefault();
     /**
      * Client-server model
@@ -60,6 +61,16 @@ class SightseeingSights extends React.Component {
       highTemperature: 50,
       meanTemperature: 50,
       medianTemperature: 50
+    });
+    this.setState({
+      sightseeingSights: sightseeingSights
+    });
+  }
+
+  handleDelete(event, deleteIndex) {
+    event.preventDefault();
+    const sightseeingSights = this.state.sightseeingSights.filter((sightseeingSight, index) => {
+      return sightseeingSight ? deleteIndex !== index : null;
     });
     this.setState({
       sightseeingSights: sightseeingSights
@@ -90,6 +101,7 @@ class SightseeingSights extends React.Component {
               <th>High Temperature</th>
               <th>Mean Temperature</th>
               <th>Median Temperature</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -101,6 +113,9 @@ class SightseeingSights extends React.Component {
                   <td>{sightseeingSight.highTemperature}</td>
                   <td>{sightseeingSight.meanTemperature}</td>
                   <td>{sightseeingSight.medianTemperature}</td>
+                  <td><button type="button" className="btn btn-dark" onClick={(event) => {
+                    this.handleDelete(event, index);
+                  }}>Delete</button></td>
                 </tr>
               );
             })}

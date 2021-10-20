@@ -1,7 +1,7 @@
 import React from 'react';
 
 class StarGazingSights extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       starGazingSights: [],
@@ -12,9 +12,10 @@ class StarGazingSights extends React.Component {
     this.handleNewLatitudeChange = this.handleNewLatitudeChange.bind(this);
     this.handleNewLongitudeChange = this.handleNewLongitudeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     /**
      * Client-server model
      * 1. Request star gazing sights from teammate star gazing service
@@ -33,19 +34,19 @@ class StarGazingSights extends React.Component {
     })
   }
 
-  handleNewLatitudeChange(event){
+  handleNewLatitudeChange(event) {
     this.setState({
       newLatitude: event.target.value
     });
   }
 
-  handleNewLongitudeChange(event){
+  handleNewLongitudeChange(event) {
     this.setState({
       newLongitude: event.target.value
     });
   }
 
-  handleSubmit(event){
+  handleSubmit(event) {
     event.preventDefault();
     /**
      * Client-server model
@@ -66,12 +67,22 @@ class StarGazingSights extends React.Component {
     });
   }
 
+  handleDelete(event, deleteIndex) {
+    event.preventDefault();
+    const starGazingSights = this.state.starGazingSights.filter((starGazingSight, index) => {
+      return starGazingSight ? deleteIndex !== index : null;
+    });
+    this.setState({
+      starGazingSights: starGazingSights
+    });
+  }
+
   render() {
     return (
       <div className="star-gazing-sights">
         {/** Header */}
         <h2>Best Star Gazing Sights Historical Weather Statistics</h2>
-        
+
         {/** New star gazing sight form */}
         <form className="form-inline">
           <label htmlFor="latitude">Latitude</label>
@@ -80,7 +91,7 @@ class StarGazingSights extends React.Component {
           <input type="number" className="form-control" id="longitude" onChange={this.handleNewLongitudeChange} />
           <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>Search</button>
         </form>
-        
+
         {/** Star gazing sights historical weather statistics table */}
         <table className="table table-bordered table-hover">
           <thead>
@@ -90,6 +101,7 @@ class StarGazingSights extends React.Component {
               <th>High Temperature</th>
               <th>Mean Temperature</th>
               <th>Median Temperature</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -101,6 +113,9 @@ class StarGazingSights extends React.Component {
                   <td>{starGazingSight.highTemperature}</td>
                   <td>{starGazingSight.meanTemperature}</td>
                   <td>{starGazingSight.medianTemperature}</td>
+                  <td><button type="button" className="btn btn-dark" onClick={(event) => {
+                    this.handleDelete(event, index);
+                  }}>Delete</button></td>
                 </tr>
               );
             })}
