@@ -21,15 +21,14 @@ class SightseeingSights extends React.Component {
      * 1. Request sightseeing sights from teammate sightseeing sights service
      * 2. Request historical weather statistics from API for each sightseeing sight
      */
-
     // Fake data
     this.setState({
       sightseeingSights: [
-        { name: "Sightseeing Sight #1", latitude: 25, longitude: 50, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Sightseeing Sight #2", latitude: 30, longitude: 60, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Sightseeing Sight #3", latitude: 35, longitude: 70, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Sightseeing Sight #4", latitude: 40, longitude: 80, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Sightseeing Sight #5", latitude: 45, longitude: 90, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
+        { latitude: 25, longitude: 50, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 30, longitude: 60, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 35, longitude: 70, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 40, longitude: 80, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 45, longitude: 90, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
       ]
     });
   }
@@ -56,7 +55,8 @@ class SightseeingSights extends React.Component {
     // Fake data
     const sightseeingSights = this.state.sightseeingSights;
     sightseeingSights.push({
-      name: `Sightseeing Sight #${this.state.newLatitude}+${this.state.newLongitude}`,
+      latitude: this.state.newLatitude,
+      longitude: this.state.newLongitude,
       lowTemperature: 50,
       highTemperature: 50,
       meanTemperature: 50,
@@ -96,7 +96,8 @@ class SightseeingSights extends React.Component {
         <table className="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
               <th>Low Temperature</th>
               <th>High Temperature</th>
               <th>Mean Temperature</th>
@@ -108,14 +109,22 @@ class SightseeingSights extends React.Component {
             {this.state.sightseeingSights.map((sightseeingSight, index) => {
               return (
                 <tr key={`sightseeing-sight-${index}`}>
-                  <td>{sightseeingSight.name}</td>
+                  <td>{sightseeingSight.latitude}</td>
+                  <td>{sightseeingSight.longitude}</td>
                   <td>{sightseeingSight.lowTemperature}</td>
                   <td>{sightseeingSight.highTemperature}</td>
                   <td>{sightseeingSight.meanTemperature}</td>
                   <td>{sightseeingSight.medianTemperature}</td>
-                  <td><button type="button" className="btn btn-dark" onClick={(event) => {
-                    this.handleDelete(event, index);
-                  }}>Delete</button></td>
+                  <td>
+                    <div className="dropdown">
+                      <button type="button" className="btn btn-dark dropdown-toggle" data-toggle="dropdown">Delete</button>
+                      <div className="dropdown-menu">
+                        <button type="button" className="btn dropdown-item" onClick={(event) => {
+                          this.handleDelete(event, index);
+                        }}>Confirm</button>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               );
             })}

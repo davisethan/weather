@@ -21,15 +21,14 @@ class Hikes extends React.Component {
      * 1. Request hikes from teammate hikes service
      * 2. Request historical weather statistics from API for each hike
      */
-
     // Fake data
     this.setState({
       hikes: [
-        { name: "Hike #1", latitude: 0, longitude: 0, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Hike #2", latitude: 5, longitude: 10, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Hike #3", latitude: 10, longitude: 20, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Hike #4", latitude: 15, longitude: 30, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { name: "Hike #5", latitude: 20, longitude: 40, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
+        { latitude: 0, longitude: 0, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 5, longitude: 10, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 10, longitude: 20, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 15, longitude: 30, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
+        { latitude: 20, longitude: 40, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
       ]
     });
   }
@@ -56,7 +55,8 @@ class Hikes extends React.Component {
     // Fake data
     const hikes = this.state.hikes;
     hikes.push({
-      name: `Hike #${this.state.newLatitude}+${this.state.newLongitude}`,
+      latitude: this.state.newLatitude,
+      longitude: this.state.newLongitude,
       lowTemperature: 50,
       highTemperature: 50,
       meanTemperature: 50,
@@ -96,7 +96,8 @@ class Hikes extends React.Component {
         <table className="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
               <th>Low Temperature</th>
               <th>High Temperature</th>
               <th>Mean Temperature</th>
@@ -108,14 +109,22 @@ class Hikes extends React.Component {
             {this.state.hikes.map((hike, index) => {
               return (
                 <tr key={`hikes-${index}`}>
-                  <td>{hike.name}</td>
+                  <td>{hike.latitude}</td>
+                  <td>{hike.longitude}</td>
                   <td>{hike.lowTemperature}</td>
                   <td>{hike.highTemperature}</td>
                   <td>{hike.meanTemperature}</td>
                   <td>{hike.medianTemperature}</td>
-                  <td><button type="button" className="btn btn-dark" onClick={(event) => {
-                    this.handleDelete(event, index);
-                  }}>Delete</button></td>
+                  <td>
+                    <div className="dropdown">
+                      <button type="button" className="btn btn-dark dropdown-toggle" data-toggle="dropdown">Delete</button>
+                      <div className="dropdown-menu">
+                        <button type="button" className="btn dropdown-item" onClick={(event) => {
+                          this.handleDelete(event, index);
+                        }}>Confirm</button>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               );
             })}
