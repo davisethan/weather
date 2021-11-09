@@ -1,4 +1,9 @@
 import React from 'react';
+import async from 'async';
+import axios from 'axios';
+import stats from 'stats-lite';
+
+const API_KEY = '92bd8db205c74ef3dfbe55b1a2fb71f6';
 
 class Hikes extends React.Component {
   constructor(props) {
@@ -16,21 +21,62 @@ class Hikes extends React.Component {
   }
 
   componentDidMount() {
-    /**
-     * Client-server model
-     * 1. Request hikes from teammate hikes service
-     * 2. Request historical weather statistics from API for each hike
-     */
-    // Fake data
-    this.setState({
-      hikes: [
-        { latitude: 0, longitude: 0, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 5, longitude: 10, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 10, longitude: 20, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 15, longitude: 30, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 20, longitude: 40, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
-      ]
-    });
+    const HIKE_URL = 'http://localhost:3000/retrieve?topFive=yes';
+    axios.get(HIKE_URL)
+      .then(result => {
+        const hikes = result.data;
+        // Convert zipcodes to latitude/longitude
+        async.map(hikes, (item, callback) => {
+          const GEO_URL = `http://api.openweathermap.org/geo/1.0/zip?zip=${item.zipcode},us&appid=${API_KEY}`;
+          axios.get(GEO_URL)
+            .then(result => {
+              callback(null, {
+                latitude: result.data.lat,
+                longitude: result.data.lon
+              })
+            })
+            .catch(error => {
+              callback(error)
+            })
+        }, (error, results) => {
+          if(error){
+            console.log(error);
+            return;
+          }
+          // Get historical weather data
+          async.map(results, (item, callback) => {
+            const HISTORY_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${item.latitude}&lon=${item.longitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${API_KEY}`;
+            axios.get(HISTORY_URL)
+              .then(result => {
+                callback(null, result)
+              })
+              .catch(error => {
+                callback(error)
+              })
+          }, (error, results) => {
+            if(error){
+              console.log(error);
+              return;
+            }
+            // Set state
+            this.setState({
+              hikes: results.map(result => {
+                return {
+                  latitude: result.data.lat,
+                  longitude: result.data.lon,
+                  lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
+                  highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
+                  meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
+                  medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+                };
+              })
+            })
+          });
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   handleNewLatitudeChange(event) {
@@ -47,24 +93,25 @@ class Hikes extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    /**
-     * Client-server model
-     * 1. Request historical weather statistics for new latitude and longitude from API
-     * 2. Add new historical weather statistics to hikes state
-     */
-    // Fake data
-    const hikes = this.state.hikes;
-    hikes.push({
-      latitude: this.state.newLatitude,
-      longitude: this.state.newLongitude,
-      lowTemperature: 50,
-      highTemperature: 50,
-      meanTemperature: 50,
-      medianTemperature: 50
-    });
-    this.setState({
-      hikes: hikes
-    });
+    const HISTORY_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.state.newLatitude}&lon=${this.state.newLongitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${API_KEY}`;
+    axios.get(HISTORY_URL)
+      .then(result => {
+        const hikes = this.state.hikes;
+        hikes.push({
+          latitude: result.data.lat,
+          longitude: result.data.lon,
+          lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
+          highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
+          meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
+          medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+        });
+        this.setState({
+          hikes: hikes
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   handleDelete(event, deleteIndex) {
