@@ -1,4 +1,9 @@
 import React from 'react';
+import async from 'async';
+import axios from 'axios';
+import stats from 'stats-lite';
+
+const API_KEY = '92bd8db205c74ef3dfbe55b1a2fb71f6';
 
 class SightseeingSights extends React.Component {
   constructor(props) {
@@ -16,21 +21,52 @@ class SightseeingSights extends React.Component {
   }
 
   componentDidMount() {
-    /**
-     * Client-server model
-     * 1. Request sightseeing sights from teammate sightseeing sights service
-     * 2. Request historical weather statistics from API for each sightseeing sight
-     */
-    // Fake data
-    this.setState({
-      sightseeingSights: [
-        { latitude: 25, longitude: 50, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 30, longitude: 60, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 35, longitude: 70, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 40, longitude: 80, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 45, longitude: 90, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
-      ]
-    });
+    const SIGHTSEEING_URL = 'http://localhost:8222/sight-ideas';
+    const DOWNTOWN_PORTLAND_ZIPCODE = 97201;
+    axios.post(SIGHTSEEING_URL, {zipCode: DOWNTOWN_PORTLAND_ZIPCODE})
+      .then(result => {
+        const sights = result.data;
+        // Get historical weather data
+        async.map(sights, (item, callback) => {
+          if(!item){
+            callback(null,null);
+            return;
+          }
+          const HISTORY_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${item.latitude}&lon=${item.longitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${API_KEY}`;
+          axios.get(HISTORY_URL)
+            .then(result => {
+              callback(null, result)
+            })
+            .catch(error => {
+              callback(error)
+            })
+        }, (error, results) => {
+          if(error){
+            console.log(error);
+            return;
+          }
+          // Set state
+          this.setState({
+            sightseeingSights: results.map(result => {
+              if(!result){
+                return null;
+              }else{
+                return {
+                  latitude: result.data.lat,
+                  longitude: result.data.lon,
+                  lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
+                  highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
+                  meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
+                  medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+                };
+              }
+            }).filter(result => result)
+          })
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   handleNewLatitudeChange(event) {
@@ -47,24 +83,25 @@ class SightseeingSights extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    /**
-     * Client-server model
-     * 1. Request historical weather statistics for new latitude and longitude from API
-     * 2. Add new historical weather statistics to sightseeing sight state
-     */
-    // Fake data
-    const sightseeingSights = this.state.sightseeingSights;
-    sightseeingSights.push({
-      latitude: this.state.newLatitude,
-      longitude: this.state.newLongitude,
-      lowTemperature: 50,
-      highTemperature: 50,
-      meanTemperature: 50,
-      medianTemperature: 50
-    });
-    this.setState({
-      sightseeingSights: sightseeingSights
-    });
+    const HISTORY_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.state.newLatitude}&lon=${this.state.newLongitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${API_KEY}`;
+    axios.get(HISTORY_URL)
+      .then(result => {
+        const sightseeingSights = this.state.sightseeingSights;
+        sightseeingSights.push({
+          latitude: result.data.lat,
+          longitude: result.data.lon,
+          lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
+          highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
+          meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
+          medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+        });
+        this.setState({
+          sightseeingSights: sightseeingSights
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   handleDelete(event, deleteIndex) {

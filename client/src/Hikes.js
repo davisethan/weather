@@ -21,7 +21,7 @@ class Hikes extends React.Component {
   }
 
   componentDidMount() {
-    const HIKE_URL = 'http://localhost:3000/retrieve?topFive=yes';
+    const HIKE_URL = 'http://localhost:3040/retrieve?topFive=yes';
     axios.get(HIKE_URL)
       .then(result => {
         const hikes = result.data;

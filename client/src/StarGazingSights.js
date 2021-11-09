@@ -1,4 +1,9 @@
 import React from 'react';
+import async from 'async';
+import axios from 'axios';
+import stats from 'stats-lite';
+
+const API_KEY = '92bd8db205c74ef3dfbe55b1a2fb71f6';
 
 class StarGazingSights extends React.Component {
   constructor(props) {
@@ -16,21 +21,51 @@ class StarGazingSights extends React.Component {
   }
 
   componentDidMount() {
-    /**
-     * Client-server model
-     * 1. Request star gazing sights from teammate star gazing service
-     * 2. Request historical weather statistics from API for each star gazing sight
-     */
-    // Fake data
-    this.setState({
-      starGazingSights: [
-        { latitude: 50, longitude: 100, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 55, longitude: 110, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 60, longitude: 120, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 65, longitude: 130, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 },
-        { latitude: 70, longitude: 140, lowTemperature: 50, highTemperature: 50, meanTemperature: 50, medianTemperature: 50 }
-      ]
-    })
+    const STARGAZING_URL = 'http://localhost:5000/top5';
+    axios.get(STARGAZING_URL)
+      .then(result => {
+        const sights = result.data;
+        // Get historical weather data
+        async.map(sights, (item, callback) => {
+          if(!item){
+            callback(null,null);
+            return;
+          }
+          const HISTORY_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${item.latitude}&lon=${item.longitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${API_KEY}`;
+          axios.get(HISTORY_URL)
+            .then(result => {
+              callback(null, result)
+            })
+            .catch(error => {
+              callback(error)
+            })
+        }, (error, results) => {
+          if(error){
+            console.log(error);
+            return;
+          }
+          // Set state
+          this.setState({
+            starGazingSights: results.map(result => {
+              if(!result){
+                return null;
+              }else{
+                return {
+                  latitude: result.data.lat,
+                  longitude: result.data.lon,
+                  lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
+                  highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
+                  meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
+                  medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+                };
+              }
+            }).filter(result => result)
+          })
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   handleNewLatitudeChange(event) {
@@ -47,24 +82,25 @@ class StarGazingSights extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    /**
-     * Client-server model
-     * 1. Request historical weather statistics for new latitude and longitude from API
-     * 2. Add new historical weather statistics to star gazing sights state
-     */
-    // Fake data
-    const starGazingSights = this.state.starGazingSights;
-    starGazingSights.push({
-      latitude: this.state.newLatitude,
-      longitude: this.state.newLongitude,
-      lowTemperature: 50,
-      highTemperature: 50,
-      meanTemperature: 50,
-      medianTemperature: 50
-    });
-    this.setState({
-      starGazingSights: starGazingSights
-    });
+    const HISTORY_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.state.newLatitude}&lon=${this.state.newLongitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${API_KEY}`;
+    axios.get(HISTORY_URL)
+      .then(result => {
+        const starGazingSights = this.state.starGazingSights;
+        starGazingSights.push({
+          latitude: result.data.lat,
+          longitude: result.data.lon,
+          lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
+          highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
+          meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
+          medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+        });
+        this.setState({
+          starGazingSights: starGazingSights
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   handleDelete(event, deleteIndex) {
