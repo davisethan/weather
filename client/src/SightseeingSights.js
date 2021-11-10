@@ -54,10 +54,10 @@ class SightseeingSights extends React.Component {
                 return {
                   latitude: result.data.lat,
                   longitude: result.data.lon,
-                  lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
-                  highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
-                  meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
-                  medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+                  lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)).toFixed(2),
+                  highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)).toFixed(2),
+                  meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)).toFixed(2),
+                  medianTemperature: stats.median(result.data.daily.map(day => day.temp.day)).toFixed(2)
                 };
               }
             }).filter(result => result)
@@ -90,10 +90,10 @@ class SightseeingSights extends React.Component {
         sightseeingSights.push({
           latitude: result.data.lat,
           longitude: result.data.lon,
-          lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)),
-          highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)),
-          meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)),
-          medianTemperature: stats.median(result.data.daily.map(day => day.temp.day))
+          lowTemperature: Math.min(...result.data.daily.map(day => day.temp.min)).toFixed(2),
+          highTemperature: Math.max(...result.data.daily.map(day => day.temp.max)).toFixed(2),
+          meanTemperature: stats.mean(result.data.daily.map(day => day.temp.day)).toFixed(2),
+          medianTemperature: stats.median(result.data.daily.map(day => day.temp.day)).toFixed(2)
         });
         this.setState({
           sightseeingSights: sightseeingSights
