@@ -1,11 +1,10 @@
-var express = require('express');
 var cors = require('cors');
+var dotenv = require('dotenv');
+var express = require('express');
 var currentWeather = require('./currentWeather')
 
-// Constants
-var PORT = 3030;
-
 // Create server
+dotenv.config();
 var app = express();
 app.use(cors());
 app.use(express.json());
@@ -14,4 +13,6 @@ app.use(express.json());
 app.use(currentWeather);
 
 // Port
-app.listen(PORT);
+app.listen(process.env.PORT, function(){
+    console.log(`http://localhost:${process.env.PORT} live...`);
+});
