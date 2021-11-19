@@ -6,7 +6,7 @@ exports.currentWeatherJSONByCityName = async function(cityName){
      * :param cityName: City name
      * :return: Current weather JSON
      */
-    const URLByCitName = `${process.env.URL}?q=${cityName},or,us&units=imperial&appid=${process.env.KEY}`;
+    const URLByCitName = `${process.env.WEATHER_URL}?q=${cityName},or,us&units=imperial&appid=${process.env.WEATHER_API_KEY}`;
     try{
         var result = await superagent.get(URLByCitName);
         return currentWeatherJSON(result);
@@ -21,7 +21,7 @@ exports.currentWeatherJSONByZipCode = async function(zipCode){
      * :param zipCode: Zip code
      * :return: Current weather JSON
      */
-    var URLByZipCode = `${process.env.URL}?zip=${zipCode},us&units=imperial&appid=${process.env.KEY}`;
+    var URLByZipCode = `${process.env.WEATHER_URL}?zip=${zipCode},us&units=imperial&appid=${process.env.WEATHER_API_KEY}`;
     try{
         var result = await superagent.get(URLByZipCode);
         return currentWeatherJSON(result);
@@ -36,7 +36,7 @@ exports.currentWeatherJSONByCoordinate = async function(coordinate){
      * :param coordinate: Coordinate latitude and longitude
      * :return: current weather JSON
      */
-    var URLByCoordinate = `${process.env.URL}?lat=${coordinate.latitude}&lon=${coordinate.longitude}&units=imperial&appid=${process.env.KEY}`;
+    var URLByCoordinate = `${process.env.WEATHER_URL}?lat=${coordinate.latitude}&lon=${coordinate.longitude}&units=imperial&appid=${process.env.WEATHER_API_KEY}`;
     try{
         var result = await superagent.get(URLByCoordinate);
         return currentWeatherJSON(result);
