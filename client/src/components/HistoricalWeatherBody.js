@@ -1,17 +1,17 @@
 import React from 'react';
-// import HikesSection from './ObjectsSection/HikesSection';
-// import CrimesSection from './ObjectsSection/CrimesSection';
+import HikesSection from './ObjectsSection/HikesSection';
 import SightseeingSection from './ObjectsSection/SightseeingSection';
-// import StargazingSightsSection from './stargazingSights/StarGazingSights';
-
+import StargazingSection from './ObjectsSection/StargazingSection';
+import CrimesSection from './ObjectsSection/CrimesSection';
 
 class HistoricalWeatherBody extends React.Component{
     render(){
         return(
             <div className="historical-weather-body">
-                {/* <HikesSection/> */}
+                <HikesSection/>
                 <SightseeingSection/>
-                {/* <CrimesSection/> */}
+                <StargazingSection/>
+                <CrimesSection/>
             </div>
         )
     }

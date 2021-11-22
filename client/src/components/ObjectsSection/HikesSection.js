@@ -22,7 +22,7 @@ class HikesSection extends ObjectSection {
          * Hikes section React component did mount set state
          * @returns None
          */
-        this.setHeader('Best Oregon Hikes Historical Weather Statistics');
+        this.setHeader('Best Oregon Hikes Historical Weather');
         axios.get(process.env.REACT_APP_HIKES_URL)
         .then(result => {
             const hikes = result.data;

@@ -2,10 +2,10 @@ import async from 'async';
 import axios from 'axios';
 import ObjectSection from './ObjectsSection';
 
-class SightseeingSection extends ObjectSection {
+class StargazingSection extends ObjectSection {
     constructor(props) {
         /**
-         * Sightseeing section
+         * Stargazing section
          * @param props Parent inherited state
          * @returns None
          */
@@ -16,29 +16,28 @@ class SightseeingSection extends ObjectSection {
 
     componentDidMount() {
         /**
-         * Sightseeing section React component did mount set state
+         * Stargazing section React component did mount set state
          * @returns None
          */
-        this.setHeader('Best Oregon Sightseeing Historical Weather');
-        const DOWNTOWN_PORTLAND_ZIPCODE = 97201;
-        axios.post(process.env.REACT_APP_SIGHTSEEING_URL, { zipCode: DOWNTOWN_PORTLAND_ZIPCODE })
+        this.setHeader('Best Oregon Stargazing Historical Weather');
+        axios.get(process.env.REACT_APP_STARTGAZING_URL)
         .then(result => {
             const sights = result.data;
             async.map(sights, this.mapSight, this.afterMapSights);
         })
-        .catch(error => {});
+        .catch(error => { });
     }
 
-    mapSight(sight, callback){
+    mapSight(sight, callback) {
         /**
-         * Map sight to historical weather
+         * Map sight
          * @param sight Sight
          * @param callback Map callback
          * @returns None
          */
-        if(!sight){
+        if (!sight) {
             callback(null, null);
-        }else{
+        } else {
             const HISTORICAL_WEATHER_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${sight.latitude}&lon=${sight.longitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${process.env.REACT_APP_WEATHER_API_KEY}`;
             axios.get(HISTORICAL_WEATHER_URL)
             .then(result => callback(null, result))
@@ -46,14 +45,14 @@ class SightseeingSection extends ObjectSection {
         }
     }
 
-    afterMapSights(error, results){
+    afterMapSights(error, results) {
         /**
-         * After map sights to historical weather
-         * @param error Error mapping sights to historical weather
-         * @param results Mapped sights to historical weather
+         * After map sights
+         * @param error Error mapping sights
+         * @param results Successful mapped sights
          * @returns None
          */
-        if(!error){
+        if (!error) {
             this.setState({
                 objects: results.filter(result => result).map(result => this.newObject(result))
             });
@@ -61,4 +60,4 @@ class SightseeingSection extends ObjectSection {
     }
 }
 
-export default SightseeingSection;
+export default StargazingSection;
