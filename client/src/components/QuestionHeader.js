@@ -1,9 +1,9 @@
 import React from 'react';
 
-class Question extends React.Component{
-    render(){
-        return(
-            <div className="question">
+class QuestionHeader extends React.Component {
+    render() {
+        return (
+            <div className="question-header">
                 <div className="dropdown">
                     <button type="button" className="btn btn-primary dropdown-toggle" data-toggle="dropdown">?</button>
                     <div className="dropdown-menu">
@@ -17,4 +17,4 @@ class Question extends React.Component{
     }
 }
 
-export default Question;
+export default QuestionHeader;
