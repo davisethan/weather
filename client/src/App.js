@@ -4,14 +4,14 @@ import HistoricalWeatherBody from './components/HistoricalWeatherBody';
 import './App.css';
 
 class App extends React.Component {
-  render() {
-    return (
-      <div className="container">
-        <QuestionHeader/>
-        <HistoricalWeatherBody/>
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div className="container">
+                <QuestionHeader />
+                <HistoricalWeatherBody />
+            </div>
+        );
+    }
 }
 
 export default App;

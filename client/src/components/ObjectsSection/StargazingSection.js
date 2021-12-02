@@ -21,11 +21,11 @@ class StargazingSection extends ObjectSection {
          */
         this.setHeader('Best Oregon Stargazing Historical Weather');
         axios.get(process.env.REACT_APP_STARTGAZING_URL)
-        .then(result => {
-            const sights = result.data;
-            async.map(sights, this.mapSight, this.afterMapSights);
-        })
-        .catch(error => { });
+            .then(result => {
+                const sights = result.data;
+                async.map(sights, this.mapSight, this.afterMapSights);
+            })
+            .catch(error => { });
     }
 
     mapSight(sight, callback) {
@@ -38,10 +38,15 @@ class StargazingSection extends ObjectSection {
         if (!sight) {
             callback(null, null);
         } else {
-            const HISTORICAL_WEATHER_URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${sight.latitude}&lon=${sight.longitude}&exclude=current,minutely,hourly,alert&units=imperial&appid=${process.env.REACT_APP_WEATHER_API_KEY}`;
+            const HISTORICAL_WEATHER_URL = `https://api.openweathermap.org/data/2.5/onecall?` +
+                `lat=${sight.latitude}&` +
+                `lon=${sight.longitude}&` +
+                `exclude=current,minutely,hourly,alert&` +
+                `units=imperial&` +
+                `appid=${process.env.REACT_APP_WEATHER_API_KEY}`;
             axios.get(HISTORICAL_WEATHER_URL)
-            .then(result => callback(null, result))
-            .catch(error => callback(error));
+                .then(result => callback(null, result))
+                .catch(error => callback(error));
         }
     }
 

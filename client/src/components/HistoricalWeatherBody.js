@@ -4,14 +4,14 @@ import SightseeingSection from './ObjectsSection/SightseeingSection';
 import StargazingSection from './ObjectsSection/StargazingSection';
 import CrimesSection from './ObjectsSection/CrimesSection';
 
-class HistoricalWeatherBody extends React.Component{
-    render(){
-        return(
+class HistoricalWeatherBody extends React.Component {
+    render() {
+        return (
             <div className="historical-weather-body">
-                <HikesSection/>
-                <SightseeingSection/>
-                <StargazingSection/>
-                <CrimesSection/>
+                <HikesSection />
+                <SightseeingSection />
+                <StargazingSection />
+                <CrimesSection />
             </div>
         )
     }
