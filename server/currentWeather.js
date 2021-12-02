@@ -4,7 +4,7 @@ var utility = require('./currentWeatherUtility');
 // Create router
 var router = express.Router();
 
-router.post('/current-weather/city-name', async function(req, res){
+router.post('/current-weather/city-name', async function (req, res) {
     /**
      * Current weather by city name
      * :param req: Current weather web request
@@ -12,15 +12,15 @@ router.post('/current-weather/city-name', async function(req, res){
      * :return: None
      */
     var cityName = req.body.cityName;
-    if(!cityName){
-        res.json({error: 'Invalid city name'});
-    }else{
+    if (!cityName) {
+        res.json({ error: 'Invalid city name' });
+    } else {
         var currentWeatherJSON = await utility.currentWeatherJSONByCityName(cityName);
         res.json(currentWeatherJSON);
     }
 });
 
-router.post('/current-weather/zip-code', async function(req, res){
+router.post('/current-weather/zip-code', async function (req, res) {
     /**
      * Current weather by zip code
      * :param req: Current weather web request
@@ -28,15 +28,15 @@ router.post('/current-weather/zip-code', async function(req, res){
      * :return: None
      */
     var zipCode = req.body.zipCode;
-    if(!zipCode){
-        res.json({error: 'Invalid zip code'});
-    }else{
+    if (!zipCode) {
+        res.json({ error: 'Invalid zip code' });
+    } else {
         var currentWeatherJSON = await utility.currentWeatherJSONByZipCode(zipCode);
         res.json(currentWeatherJSON);
     }
 });
 
-router.post('/current-weather/latitude-longitude', async function(req, res){
+router.post('/current-weather/latitude-longitude', async function (req, res) {
     /**
      * Current weather by latitude and longitude
      * :param req: Current weather web request
@@ -47,9 +47,9 @@ router.post('/current-weather/latitude-longitude', async function(req, res){
         latitude: req.body.latitude,
         longitude: req.body.longitude
     };
-    if(!coordinate.latitude || !coordinate.longitude){
-        res.json({error: 'Invalid latitude or longitude'});
-    }else{
+    if (!coordinate.latitude || !coordinate.longitude) {
+        res.json({ error: 'Invalid latitude or longitude' });
+    } else {
         var currentWeatherJSON = await utility.currentWeatherJSONByCoordinate(coordinate);
         res.json(currentWeatherJSON);
     }

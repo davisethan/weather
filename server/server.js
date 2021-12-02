@@ -13,6 +13,6 @@ app.use(express.json());
 app.use(currentWeather);
 
 // Port
-app.listen(process.env.PORT, function(){
+app.listen(process.env.PORT, function () {
     console.log(`http://localhost:${process.env.PORT} live...`);
 });
